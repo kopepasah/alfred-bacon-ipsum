@@ -4,7 +4,7 @@
  * 
  * @package Bacon Ipsum
  * @author Justin Kopepasah
- * @version 1.0.0
+ * @version 1.1.0
 */
 
 function get_bacon( $query ) {
@@ -39,13 +39,15 @@ function get_bacon( $query ) {
 	*/
 	$params['paras'] = ( ! isset( $query[0] ) ) ? 5 : $query[0];
 	
+	
+	
 	/**
 	 * If the tag is and ordered or unordered list,
 	 * convert the number of paragraphs to sentences.
 	 * 
 	 * @since 1.0.0
 	*/
-	if ( in_array( $query[1], array( 'ol', 'ul' ) ) ) {
+	if ( in_array( $query[1], array( 'ol', 'ul', 's' ) ) ) {
 		$params['sentences'] = $query[0];
 	}
 	
@@ -94,58 +96,64 @@ function get_bacon( $query ) {
 	*/
 	$count = 1;
 	
-	foreach ( $data as $paragraph ) {
-		if ( in_array( $query[1], array( 'ol', 'ul' ) ) ) {
-			
-			$lists = explode( '. ', $paragraph );
-			
-			$output .= "<$query[1]>\n";
-			
-			foreach ( $lists as $list ) {
-				$output .= "    <li>$list.</li>\n";
-			}
-			
-			$output .= "</$query[1]>\n";
-				
-	    } elseif ( $query[1] == 'p' ) {
-			if ( $count >= $query[0] ) {
-				$output .= "<p>$paragraph</p>";
-			} else {
-				$output .= "<p>$paragraph</p>\n\n";
-			}
-	    } elseif ( preg_match( '/h/', $query[1] ) ) {
-			if ( $count >= 2 )
-				break;
-			
-			$paragraph = ucwords( str_replace( array( '.', ',' ), '' , $paragraph ) );
-			
-			$words = explode( ' ', $paragraph );
-				
-			$counter = 0;
-			
-			$header = array();
-			
-			foreach ( $words as $word ) {
-				if ( $counter >= $query[0] ) 
-				    break;
-				
-				$counter++;
-				
-				$header[] = $word;
-			}
-			
-			$header = implode( ' ', $header );
-			
-			$output .= "<$query[1]>$header</$query[1]>";
-		} else {
-			if ( $count >= $query[0] ) {
-				$output .= "$paragraph";
-			} else {
-				$output .= "$paragraph\n\n";
-			}
+	if ( 's' == $query[1] ) {
+		foreach ( $data as $sentence ) {
+			$output .= "$sentence";
 		}
+	} else {
+		foreach ( $data as $paragraph ) {
+			if ( in_array( $query[1], array( 'ol', 'ul' ) ) ) {
+			
+				$lists = explode( '. ', $paragraph );
+			
+				$output .= "<$query[1]>\n";
+			
+				foreach ( $lists as $list ) {
+					$output .= "    <li>$list.</li>\n";
+				}
+			
+				$output .= "</$query[1]>\n";
+				
+		    } elseif ( $query[1] == 'p' ) {
+				if ( $count >= $query[0] ) {
+					$output .= "<p>$paragraph</p>";
+				} else {
+					$output .= "<p>$paragraph</p>\n\n";
+				}
+		    } elseif ( preg_match( '/h/', $query[1] ) ) {
+				if ( $count >= 2 )
+					break;
+			
+				$paragraph = ucwords( str_replace( array( '.', ',' ), '' , $paragraph ) );
+			
+				$words = explode( ' ', $paragraph );
+				
+				$counter = 0;
+			
+				$header = array();
+			
+				foreach ( $words as $word ) {
+					if ( $counter >= $query[0] ) 
+					    break;
+				
+					$counter++;
+				
+					$header[] = $word;
+				}
+			
+				$header = implode( ' ', $header );
+			
+				$output .= "<$query[1]>$header</$query[1]>";
+			} else {
+				if ( $count >= $query[0] ) {
+					$output .= "$paragraph";
+				} else {
+					$output .= "$paragraph\n\n";
+				}
+			}
 		
-		$count++;
+			$count++;
+		}
 	}
 	
 	/**
